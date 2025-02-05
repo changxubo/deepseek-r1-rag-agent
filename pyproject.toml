@@ -1,0 +1,71 @@
+[project]
+name = "deepseek-r1-rag-agent"
+version = "0.0.1"
+description = "Starter template for making a custom langchain RAG research agent with Deepseek R1."
+authors = [
+    { name = "changxubo", email = "changxubo@outlook.com" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langgraph>=0.2.6,<0.3.0",
+    "langchain-openai>=0.3.1,<0.4.0",
+    "langchain>=0.3.13,<0.4.0",
+    "langchain-community>=0.3.16,<0.4.0",
+    "python-dotenv>=1.0.1",
+    "msgspec>=0.18.6",
+    "langchain-milvus>=0.1.8,<0.2.0",
+    "langchain-nvidia-ai-endpoints>=0.3.0,<0.4.0",
+    "pydantic>=2.10.6,<3.0.0",
+    "streamlit==1.41.1",
+    "asyncio==3.4.3"
+]
+
+[project.optional-dependencies]
+dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
+
+[build-system]
+requires = ["setuptools>=73.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["retrieval_graph", "index_graph", "shared"]
+[tool.setuptools.package-dir]
+"langgraph.templates.retrieval_graph" = "src/retrieval_graph"
+"langgraph.templates.index_graph" = "src/index_graph"
+"retrieval_graph" = "src/retrieval_graph"
+"index_graph" = "src/index_graph"
+"shared" = "src/shared"
+
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+[tool.ruff]
+lint.select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "D",    # pydocstyle
+    "D401", # First line should be in imperative mood
+    "T201",
+    "UP",
+]
+lint.ignore = [
+    "UP006",
+    "UP007",
+    # We actually do want to import from typing_extensions
+    "UP035",
+    # Relax the convention by _not_ requiring documentation for every function parameter.
+    "D417",
+    "E501",
+]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "UP"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
