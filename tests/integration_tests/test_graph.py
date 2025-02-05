@@ -14,20 +14,26 @@ from shared.retrieval import make_text_encoder
 
 
 @contextmanager
-def make_elastic_vectorstore(
+def make_milvus_vectorstore(
     configuration: BaseConfiguration,
 ) -> Generator[VectorStore, None, None]:
-    """Configure this agent to connect to a specific elastic index."""
-    from langchain_elasticsearch import ElasticsearchStore
-
+    """Configure this agent to connect to a specific milvus index."""
+     
+    from langchain_milvus.vectorstores import Milvus as LangchainMilvus
     embedding_model = make_text_encoder(configuration.embedding_model)
-    vstore = ElasticsearchStore(
-        es_user=os.environ["ELASTICSEARCH_USER"],
-        es_password=os.environ["ELASTICSEARCH_PASSWORD"],
-        es_url=os.environ["ELASTICSEARCH_URL"],
-        index_name="langchain_index",
-        embedding=embedding_model,
-    )
+     
+    connection_args={
+        "uri":os.environ.get("MILVUS_URL","http://localhost:19530"),
+        #"token":os.environ.get("MILVUS_TOKEN",""),
+        "user":os.environ.get("MILVUS_USER",""),
+        "password":os.environ.get("MILVUS_PASSWORD",""),
+    }
+    vstore = LangchainMilvus(
+            embedding_function=embedding_model,
+            collection_name="langchain_docs",
+            connection_args=connection_args, 
+            auto_id = True
+        )
     yield vstore
 
 
@@ -37,7 +43,7 @@ async def test_retrieval_graph() -> None:
     simple_doc = 'In LangGraph, nodes are typically python functions (sync or async) where the first positional argument is the state, and (optionally), the second positional argument is a "config", containing optional configurable parameters (such as a thread_id).'
     config = RunnableConfig(
         configurable={
-            "retriever_provider": "elastic-local",
+            "retriever_provider": "milvus",
             "embedding_model": "openai/text-embedding-3-small",
         }
     )
@@ -72,5 +78,5 @@ async def test_retrieval_graph() -> None:
     expect(response.lower()).to_contain("function")
 
     # clean up after test
-    with make_elastic_vectorstore(configuration) as vstore:
+    with make_milvus_vectorstore(configuration) as vstore:
         await vstore.adelete([doc_id])

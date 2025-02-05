@@ -8,9 +8,28 @@ from retrieval_graph.graph import invoke_graph
 from utils import get_streamlit_cb  # Utility function to get a Streamlit callback handler with context
 import asyncio
  
-os.environ["NVIDIA_API_KEY"] = "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"
-st.title("RAG Reseach Agent with Deepseek-R1")
-st.markdown("# Deepseek-R1 RAG Agent Full Implementation")
+os.environ["NVIDIA_API_KEY"] = "..."
+st.title("Deepseek-R1 RAG Agent")
+st.markdown(
+r"""
+    <style>
+    .stAppDeployButton,.stMainMenu {
+            visibility: hidden;
+            display: none;
+        }
+   
+    div[data-testid="stChatMessageAvatarUser"] {
+        border-radius: 50%;
+        background-color: #0099ff;
+        }
+    div[data-testid="stChatMessageAvatarAssistant"] {
+        border-radius: 50%;
+        background-color: #76b900;
+        }
+    </style>
+    """,
+unsafe_allow_html=True
+)
 # st write magic
 """
     This is a simple RAG agent that uses langchain,langgraph,streamlit and NVIDIA NIM APIs to implement a deep research agent.

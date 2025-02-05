@@ -27,6 +27,7 @@ class AgentConfiguration(BaseConfiguration):
     response_model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
         #default="anthropic/claude-3-5-sonnet-20240620",
         default="nvidia/deepseek-ai/deepseek-r1",
+        #default="nvidia/meta/llama-3.3-70b-instruct",
         metadata={
             "description": "The language model used for generating responses. Should be in the form: provider/model-name."
         },

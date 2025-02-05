@@ -274,10 +274,12 @@ async def invoke_graph(st_messages, st_placeholder):
     thoughts_placeholder = (
         container.container()
     )  # Container for displaying status messages
+    
+    # Placeholder for displaying status messages
     token_placeholder = (
         container.empty()
     )  # Placeholder for displaying progressive token updates
-
+    
     final_text = ""
     thoughts = [""]  # Initialize an empty list to store thoughts
     # Invoke the graph with the current messages and callback configuration
@@ -294,62 +296,48 @@ async def invoke_graph(st_messages, st_placeholder):
     ):
         kind = event["name"]  # Determine the type of event received
         trigger = event["event"]
-        
-        if kind == "RetrievalGraph" and trigger == "on_chain_start":
+        meta = event["metadata"]
+        #print(kind, trigger)
+        if kind == "analyze_and_route_query" and trigger == "on_chain_start":
             start_time = time.time()  # Record the start time
+            thinked_time =time.time()-start_time
             with thoughts_placeholder:
-                status_placeholder = st.empty()
+                status_placeholder = st.empty()  
                 with status_placeholder.status(
-                    "Thinking ...", expanded=True
+                    "Thinking ...", expanded=False
                 ) as s:
                     output_placeholder = st.empty()
-                    s.update(
-                       label=f"Thinking ...", expanded=True
-                    )  # Update the status message with total tokens consumed
         elif kind == "RetrievalGraph" and trigger == "on_chain_end":
             with thoughts_placeholder:
-                elapsed_time = time.time() - start_time  # Calculate elapsed time
-                output_placeholder.write("\n\n".join(thoughts)) 
-                status_placeholder.success(
-                    label=f"Thinked in {elapsed_time:.2f} seconds", expanded=True
-                )  # Update the status message with total tokens consumed
-                
+                with status_placeholder.status(
+                    "Thinking ...", expanded=False
+                ) as s:
+                    thinked_time =time.time()-start_time
+                    s.update(label=f"Thinked in {int(thinked_time)} seconds.",expanded=False)  # Update the status message with total tokens consumed
+                    output_placeholder.write("\n\n".join(thoughts)) 
         elif kind == "analyze_and_route_query" and trigger == "on_chain_end":
             if "output" in event["data"] and "router" in event["data"]["output"]:
-                
-                json_output = json.dumps(event["data"]["output"]["router"], indent=4)
-                thoughts.append(f"Analyze and route query -> {json_output}")
+                thoughts.append(f"Analyze and route query: {event["data"]["output"]["router"]["type"]}.")
                 output_placeholder.write("\n\n".join(thoughts))         
         elif kind == "create_research_plan" and trigger == "on_chain_end":
             if "output" in event["data"] and "steps" in event["data"]["output"]:
-       
-                json_output = json.dumps(event["data"]["output"]["steps"], indent=4)
-                thoughts.append(f"Create research plan -> {json_output}")
-               
+                thoughts.append(f"Create research plan: {" ".join(event["data"]["output"]["steps"])}.")
                 output_placeholder.write("\n\n".join(thoughts))    
         elif kind == "generate_queries" and trigger == "on_chain_end":
             if "output" in event["data"] and "queries" in event["data"]["output"]:
-                json_output = json.dumps(event["data"]["output"]["queries"], indent=4)
-                thoughts.append(f"Generate queries -> {json_output}")
-               
-                
+                thoughts.append(f"Generate queries: {" && ".join(event["data"]["output"]["queries"])}.")
                 output_placeholder.write("\n\n".join(thoughts))    
-              
-                
         elif kind == "conduct_research" and trigger == "on_chain_end":
             if "output" in event["data"] and "documents" in event["data"]["output"]:
-                
-                thoughts.append(f"Conduct research -> retrived documents {len(event["data"]["output"]["documents"])}")
+                thoughts.append(f"Conduct research and retrived {len(event["data"]["output"]["documents"])} documents.")
                 output_placeholder.write("\n\n".join(thoughts))    
-        elif trigger == "on_chat_model_stream":
-            #  kind  in ["ask_for_more_info", "respond_to_general_query", "respond"]
-            if "output" in event["data"] and "messages" in event["data"]["output"]:
-                final_text += event["data"]["output"]["messages"][-1]
-                token_placeholder.write(final_text) 
-            addition = event["data"]["chunk"].content  # Extract the new content chunk
-            final_text += addition  # Append the new content to the accumulated text
-            if addition:
-                token_placeholder.write(final_text) 
-                
-
+        elif kind in ["respond","ask_for_more_info","respond_to_general_query"]and trigger == "on_chain_start":
+            if "input" in event["data"] :
+                thoughts.append(f"Generate response ...")
+                output_placeholder.write("\n\n".join(thoughts))   
+        elif trigger == "on_chat_model_stream" and meta["langgraph_node"] in ["respond","ask_for_more_info","respond_to_general_query"]:
+            if "chunk" in event["data"]:
+                final_text += event["data"]["chunk"].content
+                token_placeholder.write(final_text)
+            
     return final_text  # Return the final accumulated text
