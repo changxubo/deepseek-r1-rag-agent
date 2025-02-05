@@ -304,16 +304,16 @@ async def invoke_graph(st_messages, st_placeholder):
             with thoughts_placeholder:
                 status_placeholder = st.empty()  
                 with status_placeholder.status(
-                    "Thinking ...", expanded=False
+                    "Deep thinking ...", expanded=False
                 ) as s:
                     output_placeholder = st.empty()
         elif kind == "RetrievalGraph" and trigger == "on_chain_end":
             with thoughts_placeholder:
                 with status_placeholder.status(
-                    "Thinking ...", expanded=False
+                    "Deep thinking ...", expanded=False
                 ) as s:
                     thinked_time =time.time()-start_time
-                    s.update(label=f"Thinked in {int(thinked_time)} seconds.",expanded=False)  # Update the status message with total tokens consumed
+                    s.update(label=f"Deep thinked in {int(thinked_time)} seconds.",expanded=False)  # Update the status message with total tokens consumed
                     output_placeholder.write("\n\n".join(thoughts)) 
         elif kind == "analyze_and_route_query" and trigger == "on_chain_end":
             if "output" in event["data"] and "router" in event["data"]["output"]:

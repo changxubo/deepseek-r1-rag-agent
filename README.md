@@ -5,8 +5,12 @@ This is a starter project to help you get started with developing a RAG research
 ![Graph view in LangGraph studio UI](./static/studio_ui.png)
 
 ## Streamlit App
-![Streamlit UI](./static/streamlit-run.png)
-
+```bash
+streamlit run src/app.py
+```
+![Streamlit UI](./static/streamlit-run1.png)
+![Streamlit UI](./static/streamlit-run2.png)
+![Streamlit UI](./static/streamlit-run3.png)
 ## Graphs
 
 This project has three graphs:
