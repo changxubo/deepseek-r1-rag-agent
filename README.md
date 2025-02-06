@@ -55,7 +55,7 @@ cp .env.example .env
 - In the Atlas dashboard, click on "Connect" for your cluster.
 - Choose "Connect your application" and copy the provided connection string.
 - Create a `.env` file in your project root if you haven't already.
-- Add your MongoDB Atlas connection string to the `.env` file:
+- Add your Milvus connection string to the `.env` file:
 
 ```
 MILVUS_URL=...
@@ -70,7 +70,7 @@ You can access milvus cloud to start up free instance [here](https://milvus.io/)
 The defaults values for `response_model`, `query_model` are shown below:
 
 ```yaml
-response_model: nvidia/meta/llama-3.3-70b-instruct
+response_model: nvidia/deepseek-ai/deepseek-r1
 query_model: nvidia/meta/llama-3.1-8b-instruct
 ```
 
